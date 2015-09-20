@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Passcode Generator</title>
+        <meta charset="utf-8">
+        <script src="sha256.js"></script>
+        <script src="base64.js"></script>
+        <script>
+            window.onload = function() {
+                hash(document.getElementById("form"));
+            }
+            function hash(form) {
+                var hash = CryptoJS.SHA256(form.domain.value + form.passphrase.value);
+                if (form.encoding.selectedIndex === 0) {
+                    hash = hash.toString(CryptoJS.enc.Base64);
+                } else {
+                    hash = hash.toString(CryptoJS.enc.Hex);
+                }
+                if (form.symbols.checked) {
+                    hash = hash.substring(0, form.length.value);
+                    if (/^[a-zA-Z0-9]+$/.test(hash)) {
+                        hash = hash.substring(0, form.length.value- 1) + "!";
+                    }
+                } else {
+                    hash = hash.replace(/\+/g, "");
+                    hash = hash.replace(/\//g, "");
+                    hash = hash.substring(0, form.length.value)
+                }
+                document.getElementById("hash").innerHTML = hash;
+                return false;
+            }
+        </script>
+        <style>
+            #content {
+                margin: 150px auto 150px;
+                width: 350px;
+                font-family: Arial, Sans-serif;
+                font-weight: bold;
+                font-size: 11px;
+                line-height: 20px;
+                color: #444444;
+            }
+            #title {
+                padding: 40px 10px 10px;
+                border: 1px solid #222222;
+                border-radius: 5px 5px 0px 0px;
+                background-image: linear-gradient(#333333, #222222);
+                font-size: 20px;
+                color: #EEEEEE;
+            }
+            form {
+                margin-bottom: 10px;
+                padding: 10px;
+                border: 1px solid #CCCCCC;
+                border-radius: 0px 0px 5px 5px;
+                background-color: #EEEEEE;
+            }
+            .field {
+                width: 318px;
+                margin-bottom: 5px;
+                padding: 4px;
+                border: 1px solid #CCCCCC;
+                border-radius: 4px;
+                background-color: #FCFCFC;
+                font-family: Arial, Sans-serif;
+                font-weight: bold;
+                font-size: 12px;
+                color: #444444;
+            }
+            .field:focus {
+                outline: none;
+                border: 1px solid #AAAAAA;
+                background-color: #FFFFFF;
+                box-shadow: 0px 0px 7px #CCCCCC;
+            }
+            select {
+                margin: 5px 18px 0px 0px;
+                font-family: Arial, Sans-serif;
+                font-weight: bold;
+                font-size: 12px;
+                color: #444444;
+            }
+            select:focus {
+                outline: none;
+            }
+            #passcode {
+                text-align: center;
+                font-size: 18px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="content">
+            <div id="title">
+                Passcode Generator
+            </div>
+            <form id="form" onkeyup="return hash(this);" onchange="this.onkeyup();">
+                Domain:<br/>
+                <input class="field" type="text" name="domain"/><br/>
+                Passphrase:<br/>
+                <input class="field" type="password" name="passphrase"/><br/>
+                Encoding:
+                <select name="encoding">
+                    <option selected="selected">Base64</option>
+                    <option>Hex</option>
+                </select>
+                Length:
+                <select name="length">
+                    <option value="32">32</option>
+                    <option value="16" selected="selected">16</option>
+                    <option value="8">8</option>
+                </select>
+                Symbols: <input type="checkbox" name="symbols" checked><br/>
+            </form>
+            <div id="passcode">
+                <code id="hash"></code>
+            </div>
+        </div>
+    </body>
+</html>
